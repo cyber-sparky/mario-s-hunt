@@ -1,0 +1,28 @@
+header {
+    background-color: aqua;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Center the items vertically */
+    padding: 10px 30px; /* Add padding to the header */
+}
+
+nav > ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+li {
+    margin: 0 20px; /* Adjust the margin for better spacing */
+}
+
+a {
+    text-decoration: none; /* Remove underline from links */
+    color: black; /* Set link color */
+    font-weight: bold; /* Make link text bold */
+}
+
+a:hover {
+    color: darkblue; /* Change link color on hover */
+}

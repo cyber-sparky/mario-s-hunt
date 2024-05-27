@@ -1,2 +1,3 @@
-# Mario-s-Hunt
-a simple ctf challenge implemented with oauth
+# Mario's Hunt
+
+Hey there, This is a ongoing to project for implementing OAuth

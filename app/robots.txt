@@ -1,0 +1,29 @@
+User-agent: *
+Disallow: /confidential
+
+index page maintenance la irukanum
+
+
+oauth flaw
+
+email particular email irukanum
+mail
+admin telling to erenyeager@hotmail.com
+
+Disallow: /agent-login/login
+agents only can login
+erenyeager@hotmail.com
+
+
+register
+login as user - admin email change
+register pananum na referal code generate pananum
+
+
+sql injection
+getting admin email and password
+
+login to admin
+template injection lead to rce
+
+gtfobins priv esc

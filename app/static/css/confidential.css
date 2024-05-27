@@ -1,0 +1,24 @@
+body {
+  margin-top: 3%;
+  margin-left: 5%;
+}
+.mail_section {
+  display: flex;
+  justify-content: left;
+  line-height: 60%;
+  align-items: center;
+}
+.title,
+.content {
+  margin-left: 3.5%;
+  margin-right: 20%;
+  margin-top: 1%;
+}
+.reply {
+  display: flex;
+  align-items: center;
+  border:1px solid black ;
+  border-radius: 10px;
+  width: 10%;
+  cursor: pointer;
+}
