@@ -1,9 +1,10 @@
 header {
-    background-color: aqua;
     display: flex;
     justify-content: space-between;
     align-items: center; /* Center the items vertically */
     padding: 10px 30px; /* Add padding to the header */
+    background-color:#1C1678;
+    color:white;
 }
 
 nav > ul {
@@ -19,7 +20,7 @@ li {
 
 a {
     text-decoration: none; /* Remove underline from links */
-    color: black; /* Set link color */
+    color:white;
     font-weight: bold; /* Make link text bold */
 }
 

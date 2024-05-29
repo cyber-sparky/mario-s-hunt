@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../static/css/allpage.css" />
+    <link rel="stylesheet" href="../static/css/dashboard.css" />
+</head>
+<body>
+    {% include 'header.html' %}
+    <main>
+        <img src="../static/images/background.jpg" alt="backgroundImage" class="backgroundImage" />
+        {% include 'aside.html' %}
+        <section>
+            <div class="submittedContent">
+                {% if submitted_data %}
+                <div class="submittedData">
+                    <h3>Updated Mario Powers</h3>
+                    <table>
+                        {% for item in submitted_data %}
+                        <tr>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <form action="/admin" method="get" class="reenterBtn">
+                        <button type="submit" class="btn btn-primary">Reenter</button>
+                    </form>
+                </div>
+                {% else %}
+                    <form action="/adminUpdate" method="post">
+                        <h3>Update Mario Powers</h3>
+                        <table class="table">
+                            <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th>Category</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td><input type="text" name="category1" value="{{ raw_input.category1 }}" required /></td>
+                                <td><input type="text" name="value1" value="{{ raw_input.value1 }}" required /></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td><input type="text" name="category2" value="{{ raw_input.category2 }}" required /></td>
+                                <td><input type="text" name="value2" value="{{ raw_input.value2 }}" required /></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td><input type="text" name="category3" value="{{ raw_input.category3 }}" required /></td>
+                                <td><input type="text" name="value3" value="{{ raw_input.value3 }}" required /></td>
+                            </tr>
+                        </table>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

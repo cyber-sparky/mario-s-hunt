@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters</title>
+    <link rel="stylesheet" href="../static/css/allpage.css">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+</head>
+<body>
+    {% include 'header.html' %}
+    <main>
+        <img
+        src="../static/images/background.jpg"
+        alt="backgroundImage"
+        class="backgroundImage"
+      />
+    {% include 'aside.html' %}
+    <section>
+        {% if user.name == USERNAME %}
+        <form class="form-inline my-2 my-lg-0" action="search_character"> 
+            <label class="search_title">Search Characters</label>
+            <div class="search">
+            <input class="form-control mr-sm-2" name="name" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </div>
+          </form>
+          <div class="result">
+            {% if error %}
+            <p class="errorMessage">{{ error }}</p>
+            {% endif %}
+            <table>
+                <tr>
+                  <th>S.No</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                </tr>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result[0] }}</td>
+                        <td>{{ result[1] }}</td>
+                        <td>{{ result[2] }}</td>
+                    </tr>
+                    {% endfor %}
+              </table> 
+          </div>
+          {% else %}
+          <h1>Unauthorized</h1>
+          {% endif %}
+    </section>
+    </main>
+</body>
+</html>

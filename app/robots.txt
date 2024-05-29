@@ -1,16 +1,17 @@
 User-agent: *
 Disallow: /confidential
+Disallow: /login
 
 index page maintenance la irukanum
-
-
-oauth flaw
+bowser@mariohub.com
+Kidn@pth3princ3ss
+//oauth flaw
+change of plan, cannot make the oauth vulnerable.
 
 email particular email irukanum
 mail
 admin telling to erenyeager@hotmail.com
 
-Disallow: /agent-login/login
 agents only can login
 erenyeager@hotmail.com
 
@@ -27,3 +28,13 @@ login to admin
 template injection lead to rce
 
 gtfobins priv esc
+--
+
+robots poraan
+confidential paakuren
+rabbit poraan, data edukuran
+login pandraan
+sql injection pandraan
+admin ah login pandraan
+template injection lead to rce
+gtfobins priv edukuran

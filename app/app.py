@@ -4,7 +4,10 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for, send_from_directory
+from flask import Flask, redirect, render_template, session, url_for, send_from_directory, request, render_template_string
+from flask_mysqldb import MySQL
+from flask_session import Session
+from functools import wraps
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -13,6 +16,9 @@ if ENV_FILE:
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
 
+app.config["SESSION_PERMANENET"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 oauth = OAuth(app)
 
 oauth.register(
@@ -24,6 +30,14 @@ oauth.register(
     },
     server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration'
 )
+
+# MySQL configurations
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'root@123'
+app.config['MYSQL_DB'] = 'mariohunt'
+
+mysql = MySQL(app)
 
 @app.route("/login")
 def login():
@@ -37,7 +51,108 @@ def callback():
     user_info = oauth.auth0.parse_id_token(token, nonce=None)
     session["user"] = user_info
     print(user_info)
-    return redirect("/")
+    print(session["user"]["name"])
+    return redirect("/dashboard")
+
+@app.route("/dashboard")
+def dashboard():
+    user = session.get("user")  # Retrieve user information from session
+    if user is None:
+        return "Unauthorized"
+    return render_template('dashboard.html', user=user, USERNAME=env.get("USERNAME"))
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_logged_in' not in session:
+            return redirect(url_for('adminLogin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route("/adminLogin", methods=["GET", "POST"])
+def adminLogin():
+    session.clear()
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form['password']
+        if email == env.get("ADMIN") and password == env.get("ADMIN_PASSWORD"):
+            session["admin_logged_in"] = True
+            session["name"] = email
+            return redirect(url_for('admin'))
+    return render_template('adminLogin.html')
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        submitted_data = [
+            {"category": request.form.get("category1"), "value": request.form.get("value1")},
+            {"category": request.form.get("category2"), "value": request.form.get("value2")},
+            {"category": request.form.get("category3"), "value": request.form.get("value3")}
+        ]
+        return render_template('admin.html', submitted_data=submitted_data, raw_input=request.form)
+    return render_template('admin.html', submitted_data=None, raw_input=None)
+
+@app.route("/adminUpdate", methods=["GET","POST"])
+def admin_update():
+    # Get URL parameters
+    category1 = request.form.get("category1")
+    category2 = request.form.get("category2")
+    category3 = request.form.get("category3")
+    value1 = request.form.get("value1")
+    value2 = request.form.get("value2")
+    value3 = request.form.get("value2")
+    print(category1)
+     # Read the contents of the header.html file
+    with open('templates/header.html') as header_file:
+        header_html = header_file.read()
+    with open('templates/aside.html') as aside_file:
+        aside_html = aside_file.read()
+
+    base_template = '''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Update</title>
+        <link rel="stylesheet" href="../static/css/allpage.css" />
+        <link rel="stylesheet" href="../static/css/dashboard.css" />
+    </head>
+    <body>
+    ''' + header_html + '''
+        <main>
+            <img src="../static/images/background.jpg" alt="backgroundImage" class="backgroundImage" />
+            ''' + aside_html + '''
+            <section>
+                <div class="submittedContent">
+                    <div class="submittedData">
+                        <h3>Updated Mario Powers</h3>
+                        <table>
+                            <tr>
+                                <td>{}</td>
+                                <td>{}</td>
+                            </tr>
+                             <tr>
+                                <td>{}</td>
+                                <td>{}</td>
+                            </tr>
+                             <tr>
+                                <td>{}</td>
+                                <td>{}</td>
+                            </tr>
+                        </table>
+                        <form action="/admin" method="get" class="reenterBtn">
+                            <button type="submit" class="btn btn-primary">Reenter</button>
+                        </form>
+                    </div>
+                 
+                </div>
+            </section>
+        </main>
+    </body>
+    </html>
+    '''.format(category1,value1,category2,value2,category3,value3)
+    return render_template_string(base_template)
 
 @app.route("/logout")
 def logout():
@@ -54,10 +169,32 @@ def logout():
         )
     )
 
+@app.route("/search_character")
+def search_character():
+    name = request.args.get('name', '')
+    try:
+        cur = mysql.connection.cursor()
+        query = f"SELECT id, name, description FROM characters WHERE name LIKE '%{name}%'"
+        #mario%' UNION SELECT id,email,password FROM users;#
+        print(query)
+        cur.execute(query)
+        results = cur.fetchall()
+        cur.close()
+        user = session.get("user")  # Retrieve user information from session
+        return render_template('characters.html', results=results, user=user, USERNAME=env.get("USERNAME"))
+    except Exception as e:
+        error_message = f"An error occurred: {str(e)}"
+        user = session.get("user") 
+        return render_template('characters.html', error=error_message, user=user, USERNAME=env.get("USERNAME"))
 
 @app.route("/")
 def home():
     return render_template('maintenance.html')
+
+@app.route("/characters")
+def characters():
+    user = session.get("user")  # Retrieve user information from session
+    return render_template('characters.html', user=user, USERNAME=env.get("USERNAME"))
 
 @app.route('/robots.txt')
 def robots_txt():
@@ -88,7 +225,7 @@ def show_message_r_a_b_b_i():
 
 @app.route('/r/a/b/b/i/t/')
 def show_message_r_a_b_b_i_t():
-    return render_template('username.html')
+    return render_template('confidential/username.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
