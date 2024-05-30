@@ -1,9 +1,11 @@
 h1 {
   color: red;
 }
+
 main {
   display: flex;
 }
+
 .backgroundImage {
   z-index: -1;
   opacity: 0.5;
@@ -13,19 +15,24 @@ main {
   width: 100%;
   height: 100%;
 }
+
 .search {
   display: flex;
 }
+
 section {
   width: 100%;
 }
+
 form {
   margin: 10% 30% 0 30%;
 }
+
 .result {
   margin-left: 30%;
   margin-top: 3%;
 }
+
 table {
   background-color: white;
   border-radius: 30px;
@@ -33,16 +40,21 @@ table {
   width: 50%;
   border-collapse: collapse;
 }
+
 .result {
   max-height: 400px; /* Set the maximum height of the container */
   overflow-y: auto; /* Enable vertical scrolling */
   border: 1px solid #ccc; /* Add a border for clarity */
 }
+
 th,
 td {
   border: black solid 10px;
   padding: 8px;
   text-align: left;
+  word-wrap: break-word; /* Ensure long words break to fit in the cell */
+  white-space: normal; /* Allow text to wrap */
+  max-width: 200px; /* Adjust the maximum width of cells if needed */
 }
 
 th {
@@ -52,10 +64,12 @@ th {
 td {
   background-color: #fff; /* Optional: background color for cells */
 }
+
 .search_title {
   padding-top: 5%;
   padding-bottom: 2%;
 }
+
 .dashboardContent {
   display: flex;
   align-items: center;
@@ -63,29 +77,36 @@ td {
   font-size: 26px;
   width: 100%;
 }
+
 .dashboardContent > p {
   width: 33%;
 }
+
 .pfp {
   margin-top: 5%;
   width: 33%;
   border-radius: 20px;
   display: flex;
 }
+
 .pfp > img {
   width: 100%;
   height: 100%;
   margin-left: 15%;
 }
-.errorMessage{
-    margin-right: 30%;
-    color: red;
-    background-color: black;
+
+.errorMessage {
+  margin-right: 30%;
+  color: red;
+  background-color: black;
 }
-.submittedData{
+
+.submittedData {
   margin: 10% 30% 0 30%;
+  word-wrap: break-word; /* Ensure long words break to fit in the container */
 }
-.reenterBtn{
+
+.reenterBtn {
   margin-left: 0%;
   margin-top: 0%;
 }

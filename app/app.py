@@ -6,7 +6,6 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, send_from_directory, request, render_template_string
 from flask_mysqldb import MySQL
-from flask_session import Session
 from functools import wraps
 
 ENV_FILE = find_dotenv()
@@ -16,11 +15,8 @@ if ENV_FILE:
 app = Flask(__name__)
 app.secret_key = env.get("APP_SECRET_KEY")
 
-app.config["SESSION_PERMANENET"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
 oauth = OAuth(app)
-
+LocalStorageAdmin = "580c968a1ae80a6577c15c48d2c7af74"
 oauth.register(
     "auth0",
     client_id=env.get("AUTH0_CLIENT_ID"),
@@ -50,8 +46,6 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     user_info = oauth.auth0.parse_id_token(token, nonce=None)
     session["user"] = user_info
-    print(user_info)
-    print(session["user"]["name"])
     return redirect("/dashboard")
 
 @app.route("/dashboard")
@@ -75,14 +69,34 @@ def adminLogin():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form['password']
-        if email == env.get("ADMIN") and password == env.get("ADMIN_PASSWORD"):
-            session["admin_logged_in"] = True
-            session["name"] = email
-            return redirect(url_for('admin'))
+        
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, password))
+            admin_user = cur.fetchone()
+            cur.close()
+
+            if admin_user:
+                session["admin_logged_in"] = True
+                session["name"] = email
+                session["login_success"] = True  # Set the flag for successful login
+                return redirect(url_for("admin"))
+            else:
+                session["admin_logged_in"] = False
+                return render_template('adminLogin.html', error="Invalid credentials, please try again.")
+        except Exception as e:
+            return f"An error occurred: {str(e)}"
+        
     return render_template('adminLogin.html')
+
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
+    print(session.get("admin_logged_in"))
+    if session.get("admin_logged_in") == False:
+        print("inside if")
+        return redirect(url_for("adminLogin"))
+
     if request.method == "POST":
         submitted_data = [
             {"category": request.form.get("category1"), "value": request.form.get("value1")},
@@ -90,6 +104,8 @@ def admin():
             {"category": request.form.get("category3"), "value": request.form.get("value3")}
         ]
         return render_template('admin.html', submitted_data=submitted_data, raw_input=request.form)
+    
+
     return render_template('admin.html', submitted_data=None, raw_input=None)
 
 @app.route("/adminUpdate", methods=["GET","POST"])
@@ -101,7 +117,6 @@ def admin_update():
     value1 = request.form.get("value1")
     value2 = request.form.get("value2")
     value3 = request.form.get("value2")
-    print(category1)
      # Read the contents of the header.html file
     with open('templates/header.html') as header_file:
         header_html = header_file.read()
@@ -176,7 +191,6 @@ def search_character():
         cur = mysql.connection.cursor()
         query = f"SELECT id, name, description FROM characters WHERE name LIKE '%{name}%'"
         #mario%' UNION SELECT id,email,password FROM users;#
-        print(query)
         cur.execute(query)
         results = cur.fetchall()
         cur.close()
