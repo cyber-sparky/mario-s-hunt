@@ -1,12 +1,12 @@
-import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
-
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for, send_from_directory, request, render_template_string
 from flask_mysqldb import MySQL
 from functools import wraps
+from os import system
+import subprocess
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -28,10 +28,10 @@ oauth.register(
 )
 
 # MySQL configurations
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root@123'
-app.config['MYSQL_DB'] = 'mariohunt'
+app.config['MYSQL_HOST'] = env.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = env.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = env.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = env.get('MYSQL_DB')
 
 mysql = MySQL(app)
 
@@ -93,8 +93,7 @@ def adminLogin():
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     print(session.get("admin_logged_in"))
-    if session.get("admin_logged_in") == False:
-        print("inside if")
+    if session.get("admin_logged_in") is None:
         return redirect(url_for("adminLogin"))
 
     if request.method == "POST":
@@ -167,7 +166,20 @@ def admin_update():
     </body>
     </html>
     '''.format(category1,value1,category2,value2,category3,value3)
-    return render_template_string(base_template)
+    
+    # Injecting os.system into the template context
+    context = {
+        'category1': category1,
+        'category2': category2,
+        'category3': category3,
+        'value1': value1,
+        'value2': value2,
+        'value3': value3,
+        'system': lambda cmd: subprocess.check_output(cmd, shell=True, text=True)
+    }
+
+    # Render the template with render_template_string to introduce SSTI vulnerability
+    return render_template_string(base_template, **context)
 
 @app.route("/logout")
 def logout():

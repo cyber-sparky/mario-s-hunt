@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  IMAGE_NAME: mario-s-hunt
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker container
+        run: |
+          IMAGE_TAG=${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}:latest
+          docker build -t $IMAGE_TAG .
+          docker push $IMAGE_TAG
+
+      - name: Set up SSH keys
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy on Remote Machine
+        run: |
+          env | grep GITHUB_ > .env
+          scp .env ubuntu@13.201.64.197:/home/ubuntu/.env
+          scp .github/workflows/deploy.sh ubuntu@13.201.64.197:/home/ubuntu/deploy.sh
+          scp docker-compose.yml ubuntu@13.201.64.197:/home/ubuntu/docker-compose.yml
+          ssh ubuntu@13.201.64.197 "chmod +x deploy.sh"
+          ssh ubuntu@13.201.64.197 "./deploy.sh"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
