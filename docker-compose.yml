@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   web:
-    image: ghcr.io/cyber-sparky/mario-s-hunt:latest
+    image: mario
     ports:
       - "5000:5000"
     env_file:
@@ -14,8 +14,8 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_ROOT_PASSWORD=root@123
+      - MYSQL_DATABASE=mariohunt
     ports:
       - "3306:3306"
     volumes:

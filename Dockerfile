@@ -8,7 +8,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install default-libmysqlclient-dev build-essential pkg-config -y \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
 COPY . .
@@ -17,8 +18,7 @@ COPY . .
 EXPOSE 5000
 
 # Set environment variables
-ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Command to run the Flask app
-CMD ["python3", "app.py"]
+CMD ["python3", "app/app.py"]
