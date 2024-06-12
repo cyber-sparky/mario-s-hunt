@@ -49,6 +49,7 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=root@123" >> .env
           echo "MYSQL_DB=mariohunt" >> .env
           echo "MYSQL_USER=root" >> .env
+          echo "GITHUB_TOKEN=${{secrets.GITHUB_TOKEN}}" >> .env
           scp .env ubuntu@13.201.64.197:/home/ubuntu/.env
           scp .github/workflows/deploy.sh ubuntu@13.201.64.197:/home/ubuntu/deploy.sh
           scp docker-compose.yml ubuntu@13.201.64.197:/home/ubuntu/docker-compose.yml
