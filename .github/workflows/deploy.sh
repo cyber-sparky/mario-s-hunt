@@ -11,6 +11,3 @@ docker-compose pull web
 
 # Start the services
 docker-compose up -d
-
-# Clean up the .env file
-rm .env
