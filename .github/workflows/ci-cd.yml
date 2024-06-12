@@ -39,7 +39,16 @@ jobs:
 
       - name: Deploy on Remote Machine
         run: |
-          env | grep GITHUB_ > .env
+          echo "AUTH0_CLIENT_ID=NoE5nMqJfxkgb7GmEErmW0S4ycLbYPAf">> .env
+          echo "AUTH0_CLIENT_SECRET=SFj80H0lLFVfj1KXjAsI5uPvGELs2TrdKelDSGbwGQwM1eIGzs_huyJbaU2OsA-u">> .env
+          echo "AUTH0_DOMAIN=dev-joidvb5fao8vtzv4.us.auth0.com">> .env
+          echo "APP_SECRET_KEY=05a9d14e4902bd510b554f09d12a327da5b8cc3c0ab40f94856acb567845f48f">> .env
+          echo "USERNAME=bowser@mariohub.com">> .env
+          echo "ADMIN=admin@mariohub.com">> .env
+          echo "ADMIN_PASSWORD=H3Y@dm!nH3Re#" >> .env
+          echo "MYSQL_ROOT_PASSWORD=root@123" >> .env
+          echo "MYSQL_DB=mariohunt" >> .env
+          echo "MYSQL_USER=root" >> .env
           scp .env ubuntu@13.201.64.197:/home/ubuntu/.env
           scp .github/workflows/deploy.sh ubuntu@13.201.64.197:/home/ubuntu/deploy.sh
           scp docker-compose.yml ubuntu@13.201.64.197:/home/ubuntu/docker-compose.yml
